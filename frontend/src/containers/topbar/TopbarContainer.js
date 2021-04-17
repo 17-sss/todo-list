@@ -8,6 +8,8 @@ const TopbarContainer = () => {
 
     const [activityHide, setActivityHide] = useState(true);
     const [activityDatas, setActivityDatas] = useState(null);
+    // const [activityDatasTemp, setActivityDatasTemp] = useState(null);
+    // const [runningTime, setRunningTime] = useState(0);
 
     const getActivityData = () =>
         fetchData({
@@ -15,7 +17,6 @@ const TopbarContainer = () => {
             method: 'get'
         }).then((data) => {
             if (!data || !data.activities) return;
-
             setActivityDatas(
                 data.activities.map((activitieData) => {
                     const convertTime = new Date(activitieData.actionTime);
@@ -27,7 +28,9 @@ const TopbarContainer = () => {
                     }
                 }),
             );
-        });
+            // return data.activities;
+        })
+        // .then((arrActivities) => setActivityDatasTemp(arrActivities));
 
     // 1) 초기 렌더링 시
     useEffect(() => getActivityData(), []);
@@ -38,6 +41,31 @@ const TopbarContainer = () => {
             setIsDataUpdate(false);
         }
     }, [isDataUpdate, setIsDataUpdate]);
+    /*
+    // 3) 1초마다 재업뎃(render only, no getData) (~분 전, ~ 시간 전)
+    useEffect(() => {
+        const timer = () => setTimeout(() => {
+            setRunningTime(runningTime + 1);
+            if (activityDatas !== activityDatasTemp) return;
+            if (!activityDatasTemp || (activityDatasTemp.length <= 0) ) return;
+            setActivityDatas(
+                activityDatasTemp.map((activitieData) => {
+                    const convertTime = new Date(activitieData.actionTime);
+                    convertTime.setHours(convertTime.getHours() + 9);
+
+                    return {
+                        ...activitieData,
+                        convertTime: calcPastTime(convertTime),
+                    }
+                }),
+            );
+        }, 1000);
+        timer();
+        return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [runningTime]);
+    */
+
 
     const onClickForLogVisible = ({ target }) => {
         const closestMenuBtn = target.closest('button');
